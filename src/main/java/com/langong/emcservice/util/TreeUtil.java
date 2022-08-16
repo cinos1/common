@@ -12,13 +12,24 @@ public class TreeUtil {
         return getChildPerms(treeNodes, null);
     }
 
+    public static <T extends CategoryTreeNode> List<T> build(List<T> treeNodes, String rootId) {
+
+        return getChildPerms(treeNodes, rootId);
+    }
+
     public static  <T extends CategoryTreeNode> List<T> getChildPerms(List<T> list, String parentId) {
         List<T> returnList = new ArrayList<>();
         for (T t : list) {
-            // 一、根据传入的某个父节点ID,遍历该父节点的所有子节点
-            if (t.getParentId()==null || t.getParentId().equals("") || t.getParentId().equals(parentId)) {
-                recursionFn(list, t);
-                returnList.add(t);
+            if (parentId == null) { //如果传入的父节点ID为空,则遍历所有根节点
+                if (t.getParentId() == null || t.getParentId().equals("0")||t.getParentId().equals("")) {
+                    recursionFn(list, t);
+                    returnList.add(t);
+                }
+            } else { //如果传入的父节点ID不为空,则遍历该父节点的所有子节点
+                if (t.getId().equals(parentId)) {
+                    recursionFn(list, t);
+                    returnList.add(t);
+                }
             }
         }
         return returnList;
