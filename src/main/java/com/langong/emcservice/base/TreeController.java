@@ -2,12 +2,10 @@ package com.langong.emcservice.base;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.langong.emcservice.util.CategoryTreeNode;
+import com.langong.emcservice.util.StringUtil;
 import com.langong.emcservice.util.TreeUtil;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -16,8 +14,8 @@ import java.util.Objects;
 
 @Slf4j
 public class TreeController<T extends CategoryTreeNode> extends BaseController<T> {
-    @GetMapping({"/tree/{projectId}"})
-    public Result<?> queryTree(@PathVariable String projectId) {
+    @GetMapping({"/tree"})
+    public Result<?> queryTree(@RequestParam("projectId") String projectId) {
         try {
             QueryWrapper<T> queryWrapper = new QueryWrapper<>();
             if(!Objects.equals(projectId, "")){
@@ -41,7 +39,8 @@ public class TreeController<T extends CategoryTreeNode> extends BaseController<T
             QueryWrapper<T> queryWrapper = new QueryWrapper<>();
             for(String key:queryMap.keySet()){
                 if(queryMap.get(key)!=null || queryMap.get(key)!=""){
-                    queryWrapper.eq(key,queryMap.get(key));
+                    String columnName= StringUtil.toUnderlineCase(key);
+                    queryWrapper.eq(columnName,queryMap.get(key));
                 }
             }
 

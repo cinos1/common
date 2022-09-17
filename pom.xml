@@ -11,7 +11,7 @@
     <packaging>jar</packaging>
     <groupId>com.cn-langong</groupId>
     <artifactId>common</artifactId>
-    <version>1.0.2</version>
+    <version>1.0.4</version>
     <name>common</name>
     <description>a restful api component</description>
     <dependencies>
@@ -23,7 +23,7 @@
         <dependency>
             <groupId>com.baomidou</groupId>
             <artifactId>mybatis-plus-boot-starter</artifactId>
-            <version>3.5.1</version>
+            <version>3.5.2</version>
         </dependency>
         <dependency>
             <groupId>org.postgresql</groupId>

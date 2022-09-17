@@ -13,6 +13,7 @@ import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.langong.emcservice.annotation.Wrapper;
+import com.langong.emcservice.domain.ColumnInfo;
 import com.langong.emcservice.domain.SecTableInfo;
 import com.langong.emcservice.mapper.SubTableQuery;
 import com.langong.emcservice.util.StringUtil;
@@ -52,10 +53,9 @@ public class BaseController<T> {
             } else {
                 return Result.error("新增对象不能为空");
             }
-        }catch(DuplicateKeyException e) {
+        } catch (DuplicateKeyException e) {
             return Result.error("新增失败，该记录已存在");
-        }
-        catch (Exception var3) {
+        } catch (Exception var3) {
             log.error("新增错误:" + var3.getMessage());
             return Result.error(var3.getMessage());
         }
@@ -63,133 +63,106 @@ public class BaseController<T> {
 
     @PostMapping({"batch/add"})
     public Result<?> batchAdd(@RequestBody Collection<T> t) {
-        try {
-            if (t != null) {
-                return Result.ok(this.iService.saveOrUpdateBatch(t));
-            } else {
-                return Result.error("新增对象不能为空");
-            }
-        } catch (Exception var3) {
-            log.error("新增错误:" + var3.getMessage());
-            return Result.error(var3.getMessage());
+        if (t != null) {
+            return Result.ok(this.iService.saveOrUpdateBatch(t));
+        } else {
+            return Result.error("新增对象不能为空");
         }
     }
 
     @GetMapping({"/delete/{id}"})
     public Result<?> delete(@PathVariable Serializable id) {
-        try {
-            if (logicDelete) {
-                return Result.ok(this.iService.update(new UpdateWrapper<T>().eq("id", id).set("is_delete", true)));
-            } else {
-                return Result.ok(this.iService.removeById(id));
-            }
-        } catch (Exception var3) {
-            log.error("根据ID删除错误:" + var3.getMessage());
-            return Result.error("根据唯一标识删除失败");
+        if (logicDelete) {
+            return Result.ok(this.iService.update(new UpdateWrapper<T>().eq("id", id).set("is_delete", true)));
+        } else {
+            return Result.ok(this.iService.removeById(id));
         }
     }
 
     @PostMapping({"/delete"})
     public Result<?> batchDelete(@RequestBody List<Serializable> ids) {
-        try {
-            if (logicDelete) {
-                return Result.ok(this.iService.update(new UpdateWrapper<T>().in("id", ids).set("is_delete", true)));
-            } else {
-                return Result.ok(this.iService.removeByIds(ids));
-            }
-        } catch (Exception var3) {
-            log.error("根据唯一标识批量删除，错误:" + var3.getMessage());
-            return Result.error("根据唯一标识批量删除失败");
+        if (logicDelete) {
+            return Result.ok(this.iService.update(new UpdateWrapper<T>().in("id", ids).set("is_delete", true)));
+        } else {
+            return Result.ok(this.iService.removeByIds(ids));
         }
     }
 
-    @GetMapping({"/query/{id}"})
-    public Result<?> query(@PathVariable String id, T t) {
-        try {
-            QueryWrapper<T> queryWrapper = new QueryWrapper<>();
-            Class<?> clzz = t.getClass();
-            Field fid = clzz.getDeclaredField("id");
-            out.println(fid.getType().getTypeName());
-            if (fid.getType().getTypeName().equals("java.lang.Integer")) {
-                int iid = Integer.parseInt(id);
-                queryWrapper.eq("id", iid);
-            } else {
-                queryWrapper.eq("id", id);
-            }
-            var res = this.iService.getOne(queryWrapper);
-            one2one(res);
-            return Result.ok(res);
-        } catch (Exception var3) {
-            var3.printStackTrace();
-            log.error("根据ID查询错误:" + var3.getMessage());
-            return Result.error("根据ID查询失败");
+    @GetMapping({"/query/{id}","/query/{id}/{column}"})
+    public Result<?> query(@PathVariable String id,@PathVariable(required = false) boolean column, T t) throws NoSuchFieldException {
+        QueryWrapper<T> queryWrapper = new QueryWrapper<>();
+        Class<?> clzz = t.getClass();
+        Field fid = clzz.getDeclaredField("id");
+        out.println(fid.getType().getTypeName());
+        if (fid.getType().getTypeName().equals("java.lang.Integer")) {
+            int iid = Integer.parseInt(id);
+            queryWrapper.eq("id", iid);
+        } else {
+            queryWrapper.eq("id", id);
         }
+        var res = this.iService.getOne(queryWrapper);
+        one2one(res);
+        if (column){
+            TableName tn = clzz.getAnnotation(TableName.class);
+            String tableName = tn.value();
+            List<ColumnInfo> columns=dynamic.getColumns(tableName);
+            return Result.ok(res,columns);
+        }
+        return Result.ok(res);
     }
 
     @PostMapping({"/edit"})
     public Result<?> edit(@RequestBody T t) {
-
-        try {
-            if (t != null) {
-                return Result.ok(this.iService.updateById(t));
-            } else {
-                return Result.error("更新对象不能为空");
-            }
-        } catch (Exception var3) {
-            log.error("更新错误:" + var3.getMessage());
-            return Result.error("更新失败");
+        if (t != null) {
+            return Result.ok(this.iService.updateById(t));
+        } else {
+            return Result.error("更新对象不能为空");
         }
     }
 
     @PostMapping({"/query/list"})
-    public Result<?> queryO2o(HttpServletRequest request) {
+    public Result<?> queryO2o(HttpServletRequest request) throws IOException, IllegalAccessException {
         StringBuilder data = new StringBuilder();
         String line;
         BufferedReader reader;
-        try {
-            //获取request分页请求参数
-            reader = request.getReader();
-            while (null != (line = reader.readLine())) {
-                data.append(line);
-            }
-            reader.close();
-            T t = JSONUtil.toBean(data.toString(), this.iService.getEntityClass());
-            QueryWrapper<T> queryWrapper = WrapperHelp.getWrapper(t);
-            if (logicDelete) {
-                queryWrapper.eq("is_delete", false);
-            }
-
-            PageData pageData = JSONUtil.toBean(data.toString(), PageData.class);
-
-            Page<T> resPage = this.iService.page(new Page<>(pageData.getCurrent(), pageData.getLimit()), queryWrapper);
-            one2one(resPage);
-            return Result.ok(resPage);
-
-        } catch (Exception var3) {
-            var3.printStackTrace();
-            log.error("列表查询,错误:" + var3.getMessage());
-            return Result.error("列表失败");
+        //获取request分页请求参数
+        reader = request.getReader();
+        while (null != (line = reader.readLine())) {
+            data.append(line);
         }
+        reader.close();
+        T t = JSONUtil.toBean(data.toString(), this.iService.getEntityClass());
+        QueryWrapper<T> queryWrapper = WrapperHelp.getWrapper(t);
+        if (logicDelete) {
+            queryWrapper.eq("is_delete", false);
+        }
+
+        PageData pageData = JSONUtil.toBean(data.toString(), PageData.class);
+
+        Page<T> resPage = this.iService.page(new Page<>(pageData.getCurrent(), pageData.getLimit()), queryWrapper);
+        one2one(resPage);
+        return Result.ok(resPage);
     }
+
     /*
     导出excel
      */
     @GetMapping({"/excel/export"})
-    public void exportExcel(T t,HttpServletResponse response) throws IOException {
+    public void exportExcel(T t, HttpServletResponse response) throws IOException {
         Class<?> cls = t.getClass();
-        TableName tn =  cls.getAnnotation(TableName.class);
+        TableName tn = cls.getAnnotation(TableName.class);
         String tableName = tn.value();
         String fileName = tableName + ".xlsx";
         List<SecTableInfo> list = dynamic.getSecTableInfo(tableName);
         List<?> data = dynamic.getTableData(tableName, list);
         ExcelWriter writer = ExcelUtil.getWriter(true);
         writer.renameSheet(tableName);
-        writer.write(data,true);
+        writer.write(data, true);
         writer.autoSizeColumnAll();
         OutputStream out = response.getOutputStream();
         response.setContentType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=utf-8");
-        response.setHeader("Content-Disposition","attachment;filename="+ fileName);
-        writer.flush(out,true);
+        response.setHeader("Content-Disposition", "attachment;filename=" + fileName);
+        writer.flush(out, true);
         writer.close();
         IoUtil.close(out);
     }
@@ -198,40 +171,40 @@ public class BaseController<T> {
      * 大数据表导出excel
      */
     @GetMapping({"/excel/bigdata/export"})
-    public void exportBigDataExcel(T t,HttpServletResponse response) throws IOException {
+    public void exportBigDataExcel(T t, HttpServletResponse response) throws IOException {
         Class<?> cls = t.getClass();
-        TableName tn =  cls.getAnnotation(TableName.class);
+        TableName tn = cls.getAnnotation(TableName.class);
         String tableName = tn.value();
         String fileName = tableName + ".xlsx";
         List<SecTableInfo> list = dynamic.getSecTableInfo(tableName);
         List<?> data = dynamic.getTableData(tableName, list);
         BigExcelWriter writer = ExcelUtil.getBigWriter();
         writer.renameSheet(tableName);
-        writer.write(data,true);
+        writer.write(data, true);
         writer.autoSizeColumnAll();
         OutputStream out = response.getOutputStream();
         response.setContentType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=utf-8");
-        response.setHeader("Content-Disposition","attachment;filename="+ fileName);
-        writer.flush(out,true);
+        response.setHeader("Content-Disposition", "attachment;filename=" + fileName);
+        writer.flush(out, true);
         writer.close();
         IoUtil.close(out);
     }
+
     /*
     导入excel
      */
     @PostMapping({"/excel/import"})
-    public Result<?> importExcel(T t,@RequestParam("file") MultipartFile file) throws IOException {
-        if (file.isEmpty())
-        {
+    public Result<?> importExcel(T t, @RequestParam("file") MultipartFile file) throws IOException {
+        if (file.isEmpty()) {
             return Result.error("请选择文件上传");
         }
         ExcelReader reader = ExcelUtil.getReader(file.getInputStream());
         Class<?> cls = t.getClass();
-        TableName tn =  cls.getAnnotation(TableName.class);
+        TableName tn = cls.getAnnotation(TableName.class);
         String tableName = tn.value();
         List<SecTableInfo> list = dynamic.getSecTableInfo(tableName);
-        Map<String,String> map = new HashMap<>();
-        list.forEach(tableInf-> map.put(tableInf.getColumnComment(),tableInf.getColumnName()));
+        Map<String, String> map = new HashMap<>();
+        list.forEach(tableInf -> map.put(tableInf.getColumnComment(), tableInf.getColumnName()));
         reader.setHeaderAlias(map);
         Collection<?> importList = reader.readAll(t.getClass());
 
@@ -245,7 +218,7 @@ public class BaseController<T> {
      * 反射获取字表中数据
      */
     public void one2one(Page<T> tPage) {
-        Class<?> cls =this.iService.getEntityClass();
+        Class<?> cls = this.iService.getEntityClass();
         Field[] fields = cls.getDeclaredFields();
         for (Field f : fields) {
             f.setAccessible(true);

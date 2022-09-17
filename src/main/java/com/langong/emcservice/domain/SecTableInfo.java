@@ -14,7 +14,7 @@ import java.io.Serializable;
 */
 @TableName(value ="d_sec_table_info")
 @Data
-public class SecTableInfo extends PageData implements Serializable {
+public class SecTableInfo implements Serializable {
 
     /**
     * id

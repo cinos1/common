@@ -1,6 +1,7 @@
 package com.langong.emcservice.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.langong.emcservice.domain.ColumnInfo;
 import com.langong.emcservice.domain.SecTableInfo;
 import com.langong.emcservice.domain.TableInfo;
 import org.apache.ibatis.annotations.*;
@@ -71,6 +72,9 @@ public interface SubTableQuery<T> extends BaseMapper<T> {
 
     @Select("select * from d_sec_table_info where table_name=#{table_name} and is_show=true")
     List<SecTableInfo> getSecTableInfo(@Param("table_name") String table_name);
+
+    @Select("select column_name,column_comment,column_type  from d_sec_table_info where table_name=#{table_name} and is_show=true and column_name!~'id' and column_name not in('create_time','update_time')")
+    List<ColumnInfo> getColumns(@Param("table_name") String table_name);
 
     @Select("<script>"
             + "select "
