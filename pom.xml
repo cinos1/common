@@ -11,7 +11,7 @@
     <packaging>jar</packaging>
     <groupId>com.cn-langong</groupId>
     <artifactId>common</artifactId>
-    <version>1.0.4</version>
+    <version>1.0.5</version>
     <name>common</name>
     <description>a restful api component</description>
     <dependencies>
