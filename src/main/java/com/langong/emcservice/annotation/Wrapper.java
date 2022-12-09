@@ -14,6 +14,8 @@ public @interface Wrapper {
     String FK() default "";
     String PK() default "id";
 
+    String OD() default "";
+
     boolean ASC() default false;
     boolean DESC() default false;
 

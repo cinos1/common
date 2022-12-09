@@ -23,6 +23,12 @@ public class WrapperHelp {
                     qw.eq(colName, val);
                 }
             } else {
+                //orderBy
+                if(w.ASC()){
+                    qw.orderByAsc(colName);
+                }else if(w.DESC()){
+                    qw.orderByDesc(colName);
+                }
                 if (w.Nullable() && (val == null || "".equals(val))) {
                     continue;
                 }
@@ -66,12 +72,7 @@ public class WrapperHelp {
                     default:
                         break;
                 }
-                //orderBy
-                if(w.ASC()){
-                    qw.orderByAsc(colName);
-                }else if(w.DESC()){
-                    qw.orderByDesc(colName);
-                }
+
             }
         }
 

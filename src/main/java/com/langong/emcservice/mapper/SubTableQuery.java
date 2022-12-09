@@ -20,8 +20,11 @@ public interface SubTableQuery<T> extends BaseMapper<T> {
             + "<foreach item='item' index='index' collection='list'      open='(' separator=',' close=')'>"
             + "#{item}"
             + "</foreach>"
+            +"<if test=\"od != null and od !=''\">"
+            +"order by ${od} desc"
+            +"</if>"
             + "</script>")
-    List<Map<String, Object>> SqlInConditoin(@Param("sub_table") String sub_table, @Param("fk") String fk, @Param("list") List<Serializable> list);
+    List<Map<String, Object>> SqlInCondition(@Param("sub_table") String sub_table, @Param("fk") String fk, @Param("list") List<Serializable> list,@Param("od") String od);
 
     @Select("select * from ${sub_table} where ${fk}=#{id} limit 1")
     Map<String, Object> SqlQueryOne(@Param("sub_table") String sub_table, @Param("fk") String fk, @Param("id") Serializable id);
