@@ -24,4 +24,11 @@ public class VueCodeGenerator {
         model.addAttribute("tableName", tableName);
         return "vue";
     }
+
+    @GetMapping("/")
+    public String index(Model model) {
+        List<?> dbInfos = subTableQuery.getDBInfo();
+        model.addAttribute("dbInfos", dbInfos);
+        return "index";
+    }
 }

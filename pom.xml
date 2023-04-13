@@ -5,13 +5,13 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>2.6.10</version>
+        <version>2.7.10</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
     <packaging>jar</packaging>
     <groupId>com.cn-langong</groupId>
     <artifactId>common</artifactId>
-    <version>1.0.7</version>
+    <version>1.0.8</version>
     <name>common</name>
     <description>a restful api component</description>
     <dependencies>
@@ -23,7 +23,7 @@
         <dependency>
             <groupId>com.baomidou</groupId>
             <artifactId>mybatis-plus-boot-starter</artifactId>
-            <version>3.5.2</version>
+            <version>3.5.3.1</version>
         </dependency>
         <dependency>
             <groupId>org.postgresql</groupId>
@@ -37,7 +37,7 @@
         <dependency>
             <groupId>cn.hutool</groupId>
             <artifactId>hutool-all</artifactId>
-            <version>5.8.5</version>
+            <version>5.8.16</version>
         </dependency>
         <dependency>
             <groupId>org.apache.poi</groupId>

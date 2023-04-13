@@ -2,6 +2,7 @@ package com.langong.emcservice.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.langong.emcservice.domain.ColumnInfo;
+import com.langong.emcservice.domain.DBInfo;
 import com.langong.emcservice.domain.SecTableInfo;
 import com.langong.emcservice.domain.TableInfo;
 import org.apache.ibatis.annotations.*;
@@ -72,6 +73,14 @@ public interface SubTableQuery<T> extends BaseMapper<T> {
             " AND A.attname NOT IN ('creator','create_time','update_time','is_delete')" +
             " AND C.relname = '${table_name}'")
     List<TableInfo> getTableInfo(@Param("table_name") String table_name);
+
+    @Select("SELECT distinct " +
+            " C.relname AS  tableName , " +
+            " COALESCE(CAST ( obj_description ( relfilenode, 'pg_class' ) AS VARCHAR ),CAST ( obj_description ( C.oid, 'pg_class' ) AS VARCHAR )) AS  tableComment  " +
+            " FROM pg_class C, information_schema.COLUMNS e " +
+            " WHERE  C.relname = e.TABLE_NAME AND e.table_schema = 'public' " +
+            " ORDER BY C.relname DESC" )
+    List<DBInfo> getDBInfo();
 
     @Select("select * from d_sec_table_info where table_name=#{table_name} and is_show=true")
     List<SecTableInfo> getSecTableInfo(@Param("table_name") String table_name);

@@ -237,7 +237,7 @@ public class BaseController<T> {
                 if (ids.size() > 0) {
                     var list = dynamic.SqlInCondition(subTableName, StringUtil.toUnderlineCase(w.FK()), ids,StringUtil.toUnderlineCase(w.OD()));
                     Map<Serializable, Map<String, Object>> subMap = new HashMap<>();
-                    String FkEntity = StringUtil.toCamelCase(w.FK());
+                    String FkEntity = StringUtil.toUnderlineCase(w.FK());
                     for (var l : list
                     ) {
                         subMap.put((Serializable) l.get(FkEntity), l);
@@ -253,7 +253,7 @@ public class BaseController<T> {
                 if (ids.size() > 0) {
                     var list = dynamic.SqlInCondition(subTableName, StringUtil.toUnderlineCase(w.FK()), ids,StringUtil.toUnderlineCase(w.OD()));
                     Map<Serializable, List<Map<String, Object>>> subListMap = new HashMap<>();
-                    String FkEntity = StringUtil.toCamelCase(w.FK());
+                    String FkEntity = StringUtil.toUnderlineCase(w.FK());
                     for (var l : list
                     ) {
                         if (subListMap.containsKey((Serializable) l.get(FkEntity))) {
