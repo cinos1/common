@@ -235,7 +235,7 @@ public class BaseController<T> {
                 //获取ids值List
                 var ids = getIds(tPage, w.PK());
                 if (ids.size() > 0) {
-                    var list = dynamic.SqlInCondition(subTableName, StringUtil.toUnderlineCase(w.FK()), ids,StringUtil.toUnderlineCase(w.OD()));
+                    var list = dynamic.SqlInCondition(subTableName, StringUtil.toUnderlineCase(w.FK()), ids,w.OD());
                     Map<Serializable, Map<String, Object>> subMap = new HashMap<>();
                     String FkEntity = StringUtil.toUnderlineCase(w.FK());
                     for (var l : list
@@ -251,7 +251,7 @@ public class BaseController<T> {
                 //获取ids值List
                 var ids = getIds(tPage, w.PK());
                 if (ids.size() > 0) {
-                    var list = dynamic.SqlInCondition(subTableName, StringUtil.toUnderlineCase(w.FK()), ids,StringUtil.toUnderlineCase(w.OD()));
+                    var list = dynamic.SqlInCondition(subTableName, StringUtil.toUnderlineCase(w.FK()), ids,w.OD());
                     Map<Serializable, List<Map<String, Object>>> subListMap = new HashMap<>();
                     String FkEntity = StringUtil.toUnderlineCase(w.FK());
                     for (var l : list
@@ -286,7 +286,10 @@ public class BaseController<T> {
             //获取注解
             Wrapper w = f.getAnnotation(Wrapper.class);
             if (w != null && w.type() == Wrapper.Type.ONE2ONE) {
-                String subTableName = "t_" + StringUtil.toUnderlineCase(f.getName());
+                String subTableName = w.SubTableName();
+                if (subTableName.equals("")) {
+                    subTableName = "t_" + StringUtil.toUnderlineCase(f.getName());
+                }
                 //获取ids值List
                 var subMap = dynamic.SqlQueryOne(subTableName, StringUtil.toUnderlineCase(w.FK()), (Serializable) ReflectUtil.getFieldValue(t, w.PK()));
                 //拼接赋值
@@ -296,7 +299,7 @@ public class BaseController<T> {
                 String subTableName = w.SubTableName();
                 List<Serializable> ids = new ArrayList<>();
                 ids.add((Serializable) ReflectUtil.getFieldValue(t, w.PK()));
-                var subList = dynamic.SqlInCondition(subTableName, StringUtil.toUnderlineCase(w.FK()), ids,StringUtil.toUnderlineCase(w.OD()));
+                var subList = dynamic.SqlInCondition(subTableName, StringUtil.toUnderlineCase(w.FK()), ids,w.OD());
                 //拼接赋值
                 ReflectUtil.setFieldValue(t, f.getName(), subList);
             }
