@@ -1,4 +1,4 @@
-package com.langong.emcservice.base;
+package com.langong.service.base;
 
 import cn.hutool.core.io.IoUtil;
 import cn.hutool.core.util.ReflectUtil;
@@ -12,12 +12,12 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
-import com.langong.emcservice.annotation.Wrapper;
-import com.langong.emcservice.domain.ColumnInfo;
-import com.langong.emcservice.domain.SecTableInfo;
-import com.langong.emcservice.mapper.SubTableQuery;
-import com.langong.emcservice.util.StringUtil;
-import com.langong.emcservice.util.WrapperHelp;
+import com.langong.service.annotation.Wrapper;
+import com.langong.service.domain.ColumnInfo;
+import com.langong.service.domain.SecTableInfo;
+import com.langong.service.mapper.SubTableQuery;
+import com.langong.service.util.StringUtil;
+import com.langong.service.util.WrapperHelp;
 import lombok.extern.slf4j.Slf4j;
 import lombok.var;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,13 +27,15 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.io.Serializable;
 import java.lang.reflect.Field;
 import java.util.*;
 
 import static java.lang.System.out;
 
-@SuppressWarnings("SpringJavaInjectionPointsAutowiringInspection")
 @Slf4j
 public class BaseController<T> {
 
@@ -44,6 +46,11 @@ public class BaseController<T> {
     @Autowired
     SubTableQuery<T> dynamic;
 
+    /**
+     * 新增
+     * @param t 实体类
+     * @return 实体类
+     */
     @PostMapping({"/add"})
     public Result<?> add(@RequestBody T t) {
         try {
@@ -61,6 +68,11 @@ public class BaseController<T> {
         }
     }
 
+    /**
+     * 批量新增
+     * @param t 实体类数组
+     * @return 结果
+     */
     @PostMapping({"batch/add"})
     public Result<?> batchAdd(@RequestBody Collection<T> t) {
         if (t != null) {
@@ -70,6 +82,11 @@ public class BaseController<T> {
         }
     }
 
+    /**
+     * 删除
+     * @param id id
+     * @return 结果
+     */
     @GetMapping({"/delete/{id}"})
     public Result<?> delete(@PathVariable Serializable id) {
         if (logicDelete) {
@@ -79,6 +96,11 @@ public class BaseController<T> {
         }
     }
 
+    /**
+     * 批量删除
+     * @param ids id数组
+     * @return 结果
+     */
     @PostMapping({"/delete"})
     public Result<?> batchDelete(@RequestBody List<Serializable> ids) {
         if (logicDelete) {
@@ -88,8 +110,16 @@ public class BaseController<T> {
         }
     }
 
+    /**
+     * 详情
+     * @param id id
+     * @param column 列
+     * @param t 实体类
+     * @return 结果
+     * @throws NoSuchFieldException 异常
+     */
     @GetMapping({"/query/{id}","/query/{id}/{column}"})
-    public Result<?> query(@PathVariable String id,@PathVariable(required = false) boolean column, T t) throws NoSuchFieldException {
+    public Result<?> query(@PathVariable String id, @PathVariable(required = false) boolean column, T t) throws NoSuchFieldException {
         QueryWrapper<T> queryWrapper = new QueryWrapper<>();
         Class<?> clzz = t.getClass();
         Field fid = clzz.getDeclaredField("id");
@@ -111,6 +141,11 @@ public class BaseController<T> {
         return Result.ok(res);
     }
 
+    /**
+     * 编辑
+     * @param t 实体类
+     * @return 结果
+     */
     @PostMapping({"/edit"})
     public Result<?> edit(@RequestBody T t) {
         if (t != null) {
@@ -120,6 +155,11 @@ public class BaseController<T> {
         }
     }
 
+    /**
+     * 列表分页查询
+     * @param request 请求查询条件
+     * @return 结果
+     */
     @PostMapping({"/query/list"})
     public Result<?> queryO2o(HttpServletRequest request) throws IOException, IllegalAccessException {
         StringBuilder data = new StringBuilder();
@@ -144,8 +184,8 @@ public class BaseController<T> {
         return Result.ok(resPage);
     }
 
-    /*
-    导出excel
+    /**
+     * 导出excel
      */
     @GetMapping({"/excel/export"})
     public void exportExcel(T t, HttpServletResponse response) throws IOException {
@@ -190,8 +230,10 @@ public class BaseController<T> {
         IoUtil.close(out);
     }
 
-    /*
-    导入excel
+    /**
+     * 导入excel
+     * @param file excel文件
+     * @return 结果
      */
     @PostMapping({"/excel/import"})
     public Result<?> importExcel(T t, @RequestParam("file") MultipartFile file) throws IOException {
@@ -237,7 +279,7 @@ public class BaseController<T> {
                 if (ids.size() > 0) {
                     var list = dynamic.SqlInCondition(subTableName, StringUtil.toUnderlineCase(w.FK()), ids,w.OD());
                     Map<Serializable, Map<String, Object>> subMap = new HashMap<>();
-                    String FkEntity = StringUtil.toUnderlineCase(w.FK());
+                    String FkEntity = StringUtil.toCamelCase(w.FK());
                     for (var l : list
                     ) {
                         subMap.put((Serializable) l.get(FkEntity), l);
@@ -253,7 +295,7 @@ public class BaseController<T> {
                 if (ids.size() > 0) {
                     var list = dynamic.SqlInCondition(subTableName, StringUtil.toUnderlineCase(w.FK()), ids,w.OD());
                     Map<Serializable, List<Map<String, Object>>> subListMap = new HashMap<>();
-                    String FkEntity = StringUtil.toUnderlineCase(w.FK());
+                    String FkEntity = StringUtil.toCamelCase(w.FK());
                     for (var l : list
                     ) {
                         if (subListMap.containsKey((Serializable) l.get(FkEntity))) {

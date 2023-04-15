@@ -1,4 +1,4 @@
-package com.langong.emcservice.base;
+package com.langong.service.base;
 
 public interface CommonConstant {
     Integer SC_INTERNAL_SERVER_ERROR_500 = 500;

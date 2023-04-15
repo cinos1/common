@@ -1,7 +1,7 @@
-package com.langong.emcservice.util;
+package com.langong.service.util;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.langong.emcservice.annotation.Wrapper;
+import com.langong.service.annotation.Wrapper;
 
 import java.lang.reflect.Field;
 

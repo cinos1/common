@@ -1,9 +1,8 @@
-package com.langong.emcservice.domain;
+package com.langong.service.domain;
 
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
-import com.langong.emcservice.base.PageData;
 import lombok.Data;
 
 import java.io.Serializable;

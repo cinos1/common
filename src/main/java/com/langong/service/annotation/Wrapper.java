@@ -1,4 +1,4 @@
-package com.langong.emcservice.annotation;
+package com.langong.service.annotation;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -13,7 +13,6 @@ public @interface Wrapper {
     String SubTableName() default "";
     String FK() default "";
     String PK() default "id";
-
     String OD() default "";
 
     boolean ASC() default false;

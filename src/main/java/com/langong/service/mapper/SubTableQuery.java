@@ -1,11 +1,14 @@
-package com.langong.emcservice.mapper;
+package com.langong.service.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import com.langong.emcservice.domain.ColumnInfo;
-import com.langong.emcservice.domain.DBInfo;
-import com.langong.emcservice.domain.SecTableInfo;
-import com.langong.emcservice.domain.TableInfo;
-import org.apache.ibatis.annotations.*;
+import com.langong.service.domain.ColumnInfo;
+import com.langong.service.domain.DBInfo;
+import com.langong.service.domain.SecTableInfo;
+import com.langong.service.domain.TableInfo;
+import org.apache.ibatis.annotations.Insert;
+import org.apache.ibatis.annotations.Param;
+import org.apache.ibatis.annotations.Select;
+import org.apache.ibatis.annotations.Update;
 
 import java.io.Serializable;
 import java.util.List;
@@ -13,7 +16,7 @@ import java.util.Map;
 
 public interface SubTableQuery<T> extends BaseMapper<T> {
 
-    @Select("SELECT * FROM ${sub_table}  WHERE ${fk} IN (select id from ${table})")
+    @Select("SELECT * FROM ${sub_table}  WHERE ${fk} IN (select id from ${table}) ")
     List<Map<String, Object>> dynamicSql(@Param("table") String table, @Param("fk") String fk, @Param("sub_table") String sub_table);
 
     @Select("<script>"

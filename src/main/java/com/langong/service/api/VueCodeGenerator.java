@@ -1,6 +1,6 @@
-package com.langong.emcservice.api;
+package com.langong.service.api;
 
-import com.langong.emcservice.mapper.SubTableQuery;
+import com.langong.service.mapper.SubTableQuery;
 import freemarker.template.Template;
 import freemarker.template.TemplateException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,14 +17,14 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.view.freemarker.FreeMarkerConfigurer;
 
 import javax.annotation.Resource;
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * vue代码生成
+ */
 @Controller
 @RequestMapping("/vcg")
 public class VueCodeGenerator {
@@ -36,6 +36,11 @@ public class VueCodeGenerator {
     @Autowired
     private FreeMarkerConfigurer freeMarkerConfigurer;
 
+    /**
+     * 根据表生成vue代码
+     * @param tableName 表名
+     * @return 代码
+     */
     @GetMapping("/{tableName}")
     public String hello(@PathVariable String tableName, Model model) {
         List<?> tableInfos = subTableQuery.getTableInfo(tableName);
@@ -44,6 +49,10 @@ public class VueCodeGenerator {
         return "vue";
     }
 
+    /**
+     * 数据库列表页
+     * @return 主页
+     */
     @GetMapping("/")
     public String index(Model model) {
         List<?> dbInfos = subTableQuery.getDBInfo();
@@ -51,6 +60,11 @@ public class VueCodeGenerator {
         return "index";
     }
 
+    /**
+     * 下载代码
+     * @param tableName 表名
+     * @return vue文件
+     */
     @GetMapping("/download/{tableName}")
     public ResponseEntity<byte[]> download(@PathVariable String tableName) throws IOException, TemplateException {
         List<?> tableInfos = subTableQuery.getTableInfo(tableName);

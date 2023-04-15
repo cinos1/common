@@ -1,13 +1,10 @@
-package com.langong.emcservice.base;
+package com.langong.service.base;
 
-import com.langong.emcservice.domain.ColumnInfo;
-import com.langong.emcservice.domain.SecTableInfo;
+import com.langong.service.domain.ColumnInfo;
 import lombok.Data;
 
 import java.io.Serializable;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 @Data
 public class Result<T> implements Serializable {

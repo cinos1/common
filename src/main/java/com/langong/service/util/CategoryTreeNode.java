@@ -1,4 +1,4 @@
-package com.langong.emcservice.util;
+package com.langong.service.util;
 
 import com.baomidou.mybatisplus.annotation.TableField;
 import lombok.Data;

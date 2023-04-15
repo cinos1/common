@@ -1,4 +1,4 @@
-package com.langong.emcservice.domain;
+package com.langong.service.domain;
 
 import lombok.Data;
 

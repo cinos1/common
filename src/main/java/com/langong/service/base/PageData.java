@@ -1,4 +1,4 @@
-package com.langong.emcservice.base;
+package com.langong.service.base;
 
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.fasterxml.jackson.annotation.JsonProperty;

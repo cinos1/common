@@ -1,6 +1,7 @@
-package com.langong.emcservice.util;
+package com.langong.service.util;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
 
 public class TreeUtil {
 

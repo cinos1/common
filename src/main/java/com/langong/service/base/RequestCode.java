@@ -1,4 +1,4 @@
-package com.langong.emcservice.base;
+package com.langong.service.base;
 
 public enum RequestCode {
     SUCCESS(0, "操作成功"),
